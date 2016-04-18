@@ -67,10 +67,10 @@ public class UserController{
         }
 	}
 	
-	@RequestMapping(value = "/logout", method = RequestMethod.POST)
+	@RequestMapping(value = "/logout", method = RequestMethod.GET)
 	public String logout(HttpSession session) throws Exception {
 		session.removeAttribute("user");
-        return "redirect:/qna/list";
+        return "redirect:/";
 	}
 	
 	@RequestMapping(value = "/profile", method = RequestMethod.GET)

@@ -22,6 +22,7 @@ import next.model.User;
 import next.service.QnaService;
 
 @Controller
+@RequestMapping("/qna")
 public class QuestionController {
 	private QuestionDao questionDao = QuestionDao.getInstance();
 	private AnswerDao answerDao = AnswerDao.getInstance();
@@ -29,7 +30,7 @@ public class QuestionController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(QuestionController.class);
 	
-	@RequestMapping(value= "/qna/show", method = RequestMethod.GET)
+	@RequestMapping(value= "/show", method = RequestMethod.GET)
 	public ModelAndView showQuestion(@RequestParam String questionId) throws Exception{
 		long id = Long.parseLong(questionId);
 		
@@ -42,7 +43,7 @@ public class QuestionController {
         return mav;
 	}
 	
-	@RequestMapping(value="/qna/form", method = RequestMethod.GET)
+	@RequestMapping(value="/form", method = RequestMethod.GET)
 	public String createQuestionForm(HttpSession session) throws Exception{
 		if (!UserSessionUtils.isLogined(session)) {
 			return "redirect:/users/loginForm";
@@ -50,7 +51,7 @@ public class QuestionController {
 		return "/qna/form";
 	}
 	
-	@RequestMapping(value="/qna/create", method = RequestMethod.POST)
+	@RequestMapping(value="/create", method = RequestMethod.POST)
 	public String createQuestion(HttpSession session, @RequestParam String title, @RequestParam String contents) throws Exception{
 		if (!UserSessionUtils.isLogined(session)) {
 			return "redirect:/users/loginForm";
@@ -61,7 +62,7 @@ public class QuestionController {
 		return "redirect:/";		
 	}
 	
-	@RequestMapping(value="/qna/updateForm", method = RequestMethod.GET)
+	@RequestMapping(value="/updateForm", method = RequestMethod.GET)
 	public ModelAndView updateQuestionForm(HttpSession session, @RequestParam String questionId) throws Exception{
 		/*
 		@RequestParam을 쓸 경우, 값이 넘어오지 않으면 에러가 발생한다. 
@@ -84,7 +85,7 @@ public class QuestionController {
 		
 	}
 	
-	@RequestMapping(value="/qna/update", method = RequestMethod.POST)
+	@RequestMapping(value="/update", method = RequestMethod.POST)
 	public String updateQuestion(HttpSession session, @RequestParam String questionId, @RequestParam String title, @RequestParam String contents) throws Exception{
 		if (!UserSessionUtils.isLogined(session)) {
 			return "redirect:/users/loginForm";
@@ -102,7 +103,7 @@ public class QuestionController {
 		return "redirect:/";		
 	}
 	
-	@RequestMapping(value="/qna/delete", method = RequestMethod.POST)
+	@RequestMapping(value="/delete", method = RequestMethod.POST)
 	public ModelAndView deleteQuestion(HttpSession session, @RequestParam String questionId) throws Exception{
 		if (!UserSessionUtils.isLogined(session)) {
 			return new ModelAndView("/users/login");
@@ -117,27 +118,6 @@ public class QuestionController {
 					.addObject("answers", qnaService.findAllByQuestionId(qId))
 					.addObject("errorMessage", e.getMessage());
 		}
-		
-	}
-	
-	@RequestMapping(value="/api/qna/deleteQuestion", method = RequestMethod.POST)
-	public ModelAndView apiDeleteQuestion(HttpSession session, @RequestParam String id) throws Exception{
-		if (!UserSessionUtils.isLogined(session)) {
-			return new ModelAndView().addObject("result", Result.fail("Login is required"));
-		}
-		
-		long questionId = Long.parseLong(id);
-		try {
-			qnaService.deleteQuestion(questionId, UserSessionUtils.getUserFromSession(session));
-			return new ModelAndView().addObject("result", Result.ok());
-		} catch (CannotDeleteException e) {
-			return new ModelAndView().addObject("result", Result.fail(e.getMessage()));
-		}
-	}
-	
-	@RequestMapping(value="/api/qna/list", method = RequestMethod.GET)
-	public ModelAndView apiQuestionList() throws Exception{
-		return null;
 		
 	}
 	
