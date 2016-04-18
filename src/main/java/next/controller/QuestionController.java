@@ -1,8 +1,6 @@
 package next.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import core.jdbc.DataAccessException;
 import next.CannotDeleteException;
 import next.dao.AnswerDao;
 import next.dao.QuestionDao;
@@ -79,7 +76,7 @@ public class QuestionController {
 		Question question = questionDao.findById(qId);
 		if (!question.isSameUser(UserSessionUtils.getUserFromSession(session))) {
 			throw new IllegalStateException("다른 사용자가 쓴 글을 수정할 수 없습니다.");
-			//에러를 던지고 나서 다른 페이지로 이동하려면...??
+			//에러를 던지고 나서 다른 페이지로 이동하려면...?? ExceptionHandler 어노테이션 
 		}
 		ModelAndView mav = new ModelAndView("/qna/update");
 		mav.addObject("question", question);
@@ -144,41 +141,4 @@ public class QuestionController {
 		
 	}
 	
-	@RequestMapping(value="/api/qna/deleteAnswer", method = RequestMethod.GET)
-	public ModelAndView addAnswer(HttpSession session, @RequestParam String answerId) throws Exception{
-		if (!UserSessionUtils.isLogined(session)) {
-			return new ModelAndView().addObject("result", Result.fail("Login is required"));
-		}
-		Long aId = Long.parseLong(answerId);
-        
-		ModelAndView mav = new ModelAndView();
-		try {
-			answerDao.delete(aId);
-			mav.addObject("result", Result.ok());
-		} catch (DataAccessException e) {
-			mav.addObject("result", Result.fail(e.getMessage()));
-		}
-		return mav;
-	}
-	
-	@RequestMapping(value="/api/qna/addAnswer", method = RequestMethod.POST)
-	public ModelAndView deleteAnswer(HttpSession session, @RequestParam String contents, @RequestParam String questionId) throws Exception{
-		LOGGER.debug("before login!!");
-		if (!UserSessionUtils.isLogined(session)) {
-			Map<String, Result> resultMap = new HashMap<String, Result>();
-			resultMap.put("result", Result.fail("Login is required"));
-			return new ModelAndView("jsonView", resultMap);
-		}
-    	User user = UserSessionUtils.getUserFromSession(session);
-		Answer answer = new Answer(user.getUserId(), contents, Long.parseLong(questionId));
-		LOGGER.debug("answer : {}", answer);
-		
-		Answer savedAnswer = answerDao.insert(answer);
-		questionDao.updateCountOfAnswer(savedAnswer.getQuestionId());
-		ModelAndView mav = new ModelAndView();
-		mav.addObject("answer", savedAnswer);
-		mav.addObject("result", Result.ok());
-		mav.setViewName("jsonView");
-		return mav;
-	}
 }

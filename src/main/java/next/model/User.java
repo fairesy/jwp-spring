@@ -50,6 +50,8 @@ public class User {
 	public boolean isSameUser(String newUserId) {
 		return userId.equals(newUserId);
 	}
+	
+	//isGuestUser() - inner class 
 
 	@Override
 	public int hashCode() {
