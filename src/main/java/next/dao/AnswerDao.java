@@ -7,17 +7,20 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import next.model.Answer;
-import core.jdbc.JdbcTemplate;
-import core.jdbc.KeyHolder;
-import core.jdbc.PreparedStatementCreator;
-import core.jdbc.RowMapper;
 
 @Repository
 public class AnswerDao {
-	private JdbcTemplate jdbcTemplate = JdbcTemplate.getInstance();
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
     public Answer insert(Answer answer) {
         String sql = "INSERT INTO ANSWERS (writer, contents, createdDate, questionId) VALUES (?, ?, ?, ?)";
@@ -33,20 +36,20 @@ public class AnswerDao {
 			}
 		};
         
-		KeyHolder keyHolder = new KeyHolder();
-        jdbcTemplate.update(psc, keyHolder);
-        return findById(keyHolder.getId());
+		KeyHolder holder = new GeneratedKeyHolder();
+		jdbcTemplate.update(sql, psc);
+        return findById(holder.getKey().intValue());
     }
 
     public Answer findById(long answerId) {
         String sql = "SELECT answerId, writer, contents, createdDate, questionId FROM ANSWERS WHERE answerId = ?";
 
         RowMapper<Answer> rm = new RowMapper<Answer>() {
-            @Override
-            public Answer mapRow(ResultSet rs) throws SQLException {
-                return new Answer(rs.getLong("answerId"), rs.getString("writer"), rs.getString("contents"),
+			@Override
+			public Answer mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return new Answer(rs.getLong("answerId"), rs.getString("writer"), rs.getString("contents"),
                         rs.getTimestamp("createdDate"), rs.getLong("questionId"));
-            }
+			}
         };
 
         return jdbcTemplate.queryForObject(sql, rm, answerId);
@@ -57,11 +60,11 @@ public class AnswerDao {
                 + "order by answerId desc";
 
         RowMapper<Answer> rm = new RowMapper<Answer>() {
-            @Override
-            public Answer mapRow(ResultSet rs) throws SQLException {
-                return new Answer(rs.getLong("answerId"), rs.getString("writer"), rs.getString("contents"),
-                        rs.getTimestamp("createdDate"), questionId);
-            }
+			@Override
+			public Answer mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return new Answer(rs.getLong("answerId"), rs.getString("writer"), rs.getString("contents"),
+						rs.getTimestamp("createdDate"), questionId);
+			}
         };
 
         return jdbcTemplate.query(sql, rm, questionId);

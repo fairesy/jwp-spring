@@ -4,15 +4,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import next.model.User;
-import core.jdbc.JdbcTemplate;
-import core.jdbc.RowMapper;
 
 @Repository
 public class UserDao {
-	private JdbcTemplate jdbcTemplate = JdbcTemplate.getInstance();
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
     public void insert(User user) {
         String sql = "INSERT INTO USERS VALUES (?, ?, ?, ?)";
@@ -26,13 +28,13 @@ public class UserDao {
         String sql = "SELECT userId, password, name, email FROM USERS WHERE userid=?";
         
         RowMapper<User> rm = new RowMapper<User>() {
-            @Override
-            public User mapRow(ResultSet rs) throws SQLException {
-                return new User(rs.getString("userId"), 
-                        rs.getString("password"), 
-                        rs.getString("name"),
-                        rs.getString("email"));
-            }
+			@Override
+			public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return new User(rs.getString("userId"), 
+						rs.getString("password"), 
+						rs.getString("name"),
+						rs.getString("email"));
+			}
         };
         
         return jdbcTemplate.queryForObject(sql, rm, userId);
@@ -43,7 +45,7 @@ public class UserDao {
         
         RowMapper<User> rm = new RowMapper<User>() {
             @Override
-            public User mapRow(ResultSet rs) throws SQLException {
+            public User mapRow(ResultSet rs, int rowNum) throws SQLException {
                 return new User(rs.getString("userId"), 
                         rs.getString("password"), 
                         rs.getString("name"),
