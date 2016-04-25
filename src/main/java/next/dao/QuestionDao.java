@@ -7,24 +7,18 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
 import core.jdbc.JdbcTemplate;
 import core.jdbc.KeyHolder;
 import core.jdbc.PreparedStatementCreator;
 import core.jdbc.RowMapper;
 import next.model.Question;
 
+@Repository
 public class QuestionDao {
-	private static QuestionDao questionDao;
 	private JdbcTemplate jdbcTemplate = JdbcTemplate.getInstance();
-	
-	private QuestionDao() {}
-	
-	public static QuestionDao getInstance() {
-		if (questionDao == null) {
-			questionDao = new QuestionDao();
-		}
-		return questionDao;
-	}
+
 	
     public Question insert(Question question) {
         String sql = "INSERT INTO QUESTIONS (writer, title, contents, createdDate) VALUES (?, ?, ?, ?)";

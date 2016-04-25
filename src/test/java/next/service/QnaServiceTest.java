@@ -17,22 +17,24 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import com.google.common.collect.Lists;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QnaServiceTest {
-	@Mock
+	@Autowired
     private QuestionDao questionDao;
-    @Mock
+	@Autowired
     private AnswerDao answerDao;
     
+    @Autowired
     private QnaService qnaService;
 
     @Before
     public void setup() {
-    	qnaService = new QnaService(questionDao, answerDao);
+
     }
     
     @Test(expected = EmptyResultDataAccessException.class)

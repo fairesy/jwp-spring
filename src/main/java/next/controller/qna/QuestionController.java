@@ -7,6 +7,7 @@ import next.model.Question;
 import next.model.User;
 import next.service.QnaService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,8 +19,10 @@ import core.web.argumentresolver.LoginUser;
 @Controller
 @RequestMapping("/questions")
 public class QuestionController {
-	private QuestionDao questionDao = QuestionDao.getInstance();
-	private QnaService qnaService = new QnaService(questionDao, AnswerDao.getInstance());
+	@Autowired
+	private QuestionDao questionDao;
+	@Autowired
+	private QnaService qnaService;
 
 	@RequestMapping(value = "/{questionId}", method = RequestMethod.GET)
 	public String show(@PathVariable long questionId, Model model) throws Exception {
