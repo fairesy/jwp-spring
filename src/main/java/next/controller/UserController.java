@@ -27,7 +27,7 @@ public class UserController{
 //			return "redirect:/users/loginForm";
 		}
     	
-        ModelAndView mav = new ModelAndView("/user/list.jsp");
+        ModelAndView mav = new ModelAndView("/user/list");
         mav.addObject("users", userDao.findAll());
         return mav;
 	}
